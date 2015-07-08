@@ -20,7 +20,7 @@ int main(int argc, char** argv)
 	//All program options
 	desc.add_options()
 			("help,h","Show this Message")
-			("colors,c",po::value<int>(), "colors for this chart" )
+			("colors,c",po::value<std::string>(), "colors for this chart" )
 			("data-file,f", po::value<std::string>(), "A file plot");
 
 	//Parse command line options
@@ -82,7 +82,8 @@ int main(int argc, char** argv)
 		else
 		{
 			std::cerr << color::red("[Error]")
-					  << " Cannot understand color file format of '" + fileName + "'"
+					  << " Cannot understand color file format of '" + fileName + "'" << std::endl
+					  << "       Just add hex-colors like #ff00ff in separate lines."
 					  << std::endl;
 		}
 	}

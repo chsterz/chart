@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <sstream>
+#include <iomanip>
 
 #include "drawing.h"
 
@@ -21,7 +22,7 @@ bool isCSV(const std::string &fileName)
 	fileContents >> dummy;
 
 	//Is there a delimiter after the first value?
-	if( fileContents.peek() == ',' || fileContents.peek() == ' ' || fileContents.peek() == '\t')
+	if (fileContents.peek() == ',' || fileContents.peek() == ' ' || fileContents.peek() == '\t')
 		return true;
 
 	return false;
@@ -35,15 +36,15 @@ Data parseCSV(const std::string &fileName)
 	std::string line;
 
 	Data data;
-	while(std::getline(file, line))
+	while (std::getline(file, line))
 	{
 		std::stringstream linestream(line);
 		Dataset linedata;
 		float currentValue;
-		while(linestream >> currentValue)
+		while (linestream >> currentValue)
 		{
 			linedata.push_back(currentValue);
-			if( linestream.peek() == ',' || linestream.peek() == ' ' || linestream.peek() == '\t')
+			if (linestream.peek() == ',' || linestream.peek() == ' ' || linestream.peek() == '\t')
 				linestream.ignore();
 		}
 		data.push_back(linedata);
@@ -65,8 +66,7 @@ bool isRowData(const std::string &fileName)
 	fileContents >> dummy;
 
 	//Is there a newline after the first value?
-	while(file)
-	if( fileContents.peek() == '\n' )
+	if (fileContents.peek() == '\n')
 		return true;
 
 	return false;
@@ -81,19 +81,19 @@ Data parseRowData(const std::string &fileName)
 
 	Data data;
 	Dataset rowsData;
-	while(std::getline(file, line))
+	while (std::getline(file, line))
 	{
 		std::stringstream linestream(line);
 
 		float currentValue;
-		if(linestream.str().empty())
+		if (linestream.str().empty())
 		{
 			data.push_back(rowsData);
 			rowsData.clear();
 			continue;
 		}
-			linestream >> currentValue;
-			rowsData.push_back(currentValue);
+		linestream >> currentValue;
+		rowsData.push_back(currentValue);
 	}
 	data.push_back(rowsData);
 	return data;
@@ -103,16 +103,37 @@ Data parseRowData(const std::string &fileName)
 
 bool isColorFile(const std::string &fileName)
 {
-	//NYI
-	return false;
+	std::ifstream file(fileName);
+	std::stringstream fileContents;
+
+	fileContents << file.rdbuf();
+	//Are all colors in Hex :)
+	if (fileContents.peek() != '#')
+		return false;
+	fileContents.ignore();
+	unsigned int dummy;
+	fileContents >> std::hex >> dummy;
+
+	//Is Each Color on a new line
+	if (fileContents.peek() != '\n')
+		return false;
+
+	return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 std::vector<Color> parseColors(const std::string &fileName)
 {
-	//NYI
-	return pie::defaultColors;
+	std::vector<Color> result;
+	std::ifstream file(fileName);
+	std::string line;
+
+	while (std::getline(file, line))
+	{
+
+	}
+	return result;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

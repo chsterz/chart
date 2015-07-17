@@ -129,6 +129,7 @@ int main(int argc, char** argv)
 	//#1 draw barcharts from the data
 	for(size_t i = 0; i < data.size(); i++)
 	{
+		if(data[i].empty()) continue;
 		std::stringstream fileNameStream;
 		fileNameStream << "Chart_" << i << ".pdf";
 		pie::BarChart(data[i], fileNameStream.str(), colors);

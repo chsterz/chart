@@ -92,7 +92,6 @@ Data parseRowData(std::istream &file)
 	DataSet rowsData;
 	while (std::getline(file, line))
 	{
-		if (line=="") continue;
 		std::stringstream linestream(line);
 
 		float currentValue;

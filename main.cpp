@@ -125,6 +125,9 @@ int main(int argc, char** argv)
 		return EXIT_FAILURE;
 	}
 
+	//rotate data
+	//TMP
+	//rotate(data);
 
 	//#1 draw barcharts from the data
 	for(size_t i = 0; i < data.size(); i++)

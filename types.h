@@ -63,6 +63,33 @@ unsigned char Color::a<unsigned char>()
 using DataSet = std::vector<float>;
 using Data = std::vector<DataSet>;
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+bool rotate(Data &data)
+{
+	size_t dataLength = data.size();
+	size_t dataSetLength = data[0].size();
+	//first check if each dataset has the same lengths
+	for (size_t i = 0; i < dataLength; i++)
+	{if (data[i].size() != dataSetLength) return false;}
+
+	Data result;
+	for(size_t j = 0; j < dataSetLength; j++)
+	{
+		DataSet dataSet;
+		for(size_t i = 0; i < dataLength; i++)
+		{
+			dataSet.push_back(data[i][j]);
+		}
+		result.push_back(dataSet);
+	}
+	data = result;
+	return true;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 using LabelSet = std::vector<std::string>;
 using Labels = std::vector<LabelSet>;
 

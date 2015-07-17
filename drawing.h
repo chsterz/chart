@@ -152,8 +152,6 @@ public:
 			cr->rectangle(ox + barWidth * index + spacer*(index+1), oy, barWidth, -1*barHeight);
 			cr->fill();
 		}
-
-
 	}
 
 	//Function for the XAxis

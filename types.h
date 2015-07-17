@@ -60,10 +60,11 @@ unsigned char Color::a<unsigned char>()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-
-
 using DataSet = std::vector<float>;
 using Data = std::vector<DataSet>;
+
+using LabelSet = std::vector<std::string>;
+using Labels = std::vector<LabelSet>;
 
 namespace pie
 {

@@ -1,4 +1,5 @@
 #pragma once
+#include <algorithm>
 
 class Color: public std::tuple<unsigned char, unsigned char, unsigned char, unsigned char>
 {
@@ -60,8 +61,17 @@ unsigned char Color::a<unsigned char>()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+using Labels = std::vector<std::string>;
+
+
 using DataSet = std::vector<float>;
-using Data = std::vector<DataSet>;
+class Data : public std::vector<DataSet>
+{
+public:
+	Labels columnLabels;
+	Labels rowLabels;
+};
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -69,11 +79,19 @@ bool rotate(Data &data)
 {
 	size_t dataLength = data.size();
 	size_t dataSetLength = data[0].size();
+
 	//first check if each dataset has the same lengths
 	for (size_t i = 0; i < dataLength; i++)
 	{if (data[i].size() != dataSetLength) return false;}
 
 	Data result;
+
+	//rotate the labels
+	std::swap(data.columnLabels, data.rowLabels);
+	result.columnLabels = data.columnLabels;
+	result.rowLabels = data.rowLabels;
+
+	//rotate the data
 	for(size_t j = 0; j < dataSetLength; j++)
 	{
 		DataSet dataSet;
@@ -83,18 +101,15 @@ bool rotate(Data &data)
 		}
 		result.push_back(dataSet);
 	}
+
 	data = result;
 	return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-using LabelSet = std::vector<std::string>;
-using Labels = std::vector<LabelSet>;
-
 namespace pie
 {
-	std::vector<Color> defaultColors = { Color(255,0,0,255), Color(0,255,0,255), Color(0,0,255,255)};
+	std::vector<Color> defaultColors = {Color(255,0,0,255), Color(0,255,0,255), Color(0,0,255,255)};
 	Color debugColor = Color(255,0,0,50);
 }

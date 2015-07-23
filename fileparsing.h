@@ -4,14 +4,31 @@
 #include <sstream>
 #include <iostream>
 #include <iomanip>
+#include <algorithm>
 
 #include "types.h"
+#include "terminalcolors.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void resetStream(std::istream &file)
 {
 	file.clear();
 	file.seekg(std::ios::beg);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+bool isSeparator(const char c)
+{
+	return (c == ',' or c == '\t' or c == ' ');
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+bool isNewline(const char c)
+{
+	return (c == '\n');
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -21,12 +38,31 @@ bool isCSV(std::istream &file)
 	std::stringstream fileContents;
 
 	fileContents << file.rdbuf();
+
+	//check first data for label
+	//assuming labels begin with a letter
+	bool message = false;
+	while (not std::isdigit(fileContents.peek()))
+	{
+		if (not message)
+		{
+			message = true;
+			std::cout << text::blue("[Info]") << " Assuming first Row as Labels" << std::endl;
+		}
+
+		std::string dummyLabel;
+		fileContents >> dummyLabel;
+
+		while (isSeparator(fileContents.peek()) or isNewline(fileContents.peek()))
+			fileContents.ignore();
+	}
+
 	//Extract one dummy value
 	float dummy;
 	fileContents >> dummy;
 
 	//Is there a delimiter after the first value?
-	if (fileContents.peek() == ',' || fileContents.peek() == ' ' || fileContents.peek() == '\t')
+	if (isSeparator(fileContents.peek()))
 	{
 		resetStream(file);
 		return true;
@@ -41,17 +77,31 @@ bool isCSV(std::istream &file)
 Data parseCSV(std::istream &file)
 {
 	std::string line;
-
 	Data data;
+
+	//See if there are labels to read
+	if (std::isalpha(file.peek()))
+	{
+		std::getline(file, line);
+		std::stringstream linestream(line);
+		std::string label;
+
+		while (linestream >> label)
+			data.columnLabels.push_back(label);
+	}
+
+	//Read the actual data
 	while (std::getline(file, line))
 	{
+		if (line.empty()) continue;
+
 		std::stringstream linestream(line);
 		DataSet linedata;
 		float currentValue;
 		while (linestream >> currentValue)
 		{
 			linedata.push_back(currentValue);
-			if (linestream.peek() == ',' || linestream.peek() == ' ' || linestream.peek() == '\t')
+			while (isSeparator(linestream.peek()))
 				linestream.ignore();
 		}
 		data.push_back(linedata);

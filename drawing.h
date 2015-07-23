@@ -13,12 +13,16 @@
 
 namespace pie
 {
+
+//Settings and Lengths
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 	//dimenstions of surface
 	const float sheight = 512;
 	const float swidth = 512;
 
 	//margins
-	const float margin_top = 5;
+	const float margin_top = 15;
 	const float margin_bottom = 5;
 	const float margin_left = 5;
 	const float margin_right = 5;
@@ -49,6 +53,16 @@ namespace pie
 	//debug mode
 	const bool debug = false;
 
+	//fonts
+	const std::string fontFace="Source Sans Pro";
+	Color fontColor = Color(128,128,128,255);
+	const int fontSize = 14;
+	//font extends
+	Cairo::FontExtents fontExtents;
+	Cairo::TextExtents textExtents;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 	//readable Output Labels
 	std::string shortLabel(float value)
 	{
@@ -62,6 +76,9 @@ namespace pie
 		return ss.str();
 	}
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+	//reasonable axis lengths
 	float computeSteps(float maxValue)
 	{
 			if (maxValue <= 0.0)
@@ -80,38 +97,32 @@ namespace pie
 			return 0.0;
 	}
 
-	const std::string fontFace="Source Sans Pro";
-	Color fontColor = Color(128,128,128,255);
-	const int fontSize = 14;
-
-	Cairo::FontExtents fontExtents;
-	Cairo::TextExtents textExtents;
-
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 class BarChart
 {
 public:
-	BarChart(const DataSet &dataset, const std::string& fileName, std::vector<Color> colors = pie::defaultColors)
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+	BarChart(const DataSet &dataset, const std::string& fileName, std::vector<Color> colors = pie::defaultColors, const std::string &title="")
 	{
 		Cairo::RefPtr<Cairo::PdfSurface> surface = Cairo::PdfSurface::create(fileName, swidth, sheight);
 		Cairo::RefPtr<Cairo::Context> cr = Cairo::Context::create(surface);
 
-		//draw background
-		cr->set_line_width(1.0f);
-		cr->set_source_rgb(1.0f, 1.0f, 1.0f);
-
 		//drawDebug(cr);
 
-		drawBars(cr, dataset, colors);
+		drawContent(cr, dataset, colors);
 		drawXAxis(cr);
 		drawYAxis(cr);
-
 
 		surface->finish();
 	}
 
-	//Draw the bars
-	void drawBars(Cairo::RefPtr<Cairo::Context> &cr, const DataSet & dataset, const std::vector<Color> colors)
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+	void drawContent(Cairo::RefPtr<Cairo::Context> &cr, const DataSet & dataset, const std::vector<Color> colors)
 	{
 		size_t numberOfBars = dataset.size();
 		float spacerSpace = (numberOfBars + 1)*spacer;
@@ -126,6 +137,7 @@ public:
 
 		for(int i=0; i <= ySteps; i++)
 		{
+			//draw y axis numbers
 			cr->select_font_face(fontFace, Cairo::FONT_SLANT_NORMAL,Cairo::FONT_WEIGHT_NORMAL);
 			cr->set_source_rgba(fontColor.r(), fontColor.g(), fontColor.b(), fontColor.a());
 			cr->set_font_size(fontSize);
@@ -134,7 +146,7 @@ public:
 			cr->move_to(ox - textExtents.width, oy + -1.0f*i*visualStepSize + textExtents.height/2);
 			cr->show_text(label);
 
-			// draw line
+			//draw lines
 			cr->move_to(ox, oy + -1.0f*i*visualStepSize);
 			cr->set_source_rgba(fontColor.r(), fontColor.g(), fontColor.b(), fontColor.a());
 			cr->line_to(ox+width, oy + -1.0f*i*visualStepSize);
@@ -142,6 +154,7 @@ public:
 
 		}
 
+		//draw the bars
 		for (size_t index = 0; index < numberOfBars; index++)
 		{
 			Color currentColor = colors[index%colors.size()];
@@ -154,19 +167,21 @@ public:
 		}
 	}
 
-	//Function for the XAxis
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 	void drawXAxis(Cairo::RefPtr<Cairo::Context> &cr)
 	{
-		//draw x-axis
 		cr->set_line_width(1.0f);
 		cr->set_source_rgba(0.0f,0.0f,0.0f,1.0f);
 		cr->move_to(ox, oy);
 		cr->line_to(ox + width, oy);
 		cr->stroke();
 	}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 	void drawYAxis(Cairo::RefPtr<Cairo::Context> &cr)
 	{
-		//draw x-axis
 		cr->set_line_width(1.0f);
 		cr->set_source_rgba(fontColor.r(), fontColor.g(), fontColor.b(), fontColor.a());
 		cr->move_to(ox, oy);
@@ -174,8 +189,8 @@ public:
 		cr->stroke();
 	}
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	//Debug draws the bounding
 	void drawDebug(Cairo::RefPtr<Cairo::Context> &cr)
 	{
 		cr->set_line_width(1.0f);
@@ -194,6 +209,5 @@ public:
 		cr->stroke();
 	}
 };
-
 
 }

@@ -127,15 +127,23 @@ int main(int argc, char** argv)
 
 	//rotate data
 	//TMP
-	//rotate(data);
+	if (not rotate(data))
+	{
+		std::cerr << text::blue("[Info]") << " Could not rotate data." << std::endl;
+	}
 
 	//#1 draw barcharts from the data
 	for(size_t i = 0; i < data.size(); i++)
 	{
-		if(data[i].empty()) continue;
-		std::stringstream fileNameStream;
-		fileNameStream << "Chart_" << i << ".pdf";
-		pie::BarChart(data[i], fileNameStream.str(), colors);
+		if (data[i].empty()) continue;
+
+		std::stringstream name;
+		if (not data.rowLabels.empty())
+			name << data.rowLabels[i];
+		else
+			name << "Chart "  << i;
+
+		pie::BarChart(data[i], name.str() + ".pdf", colors, name.str());
 	}
 
 	return EXIT_SUCCESS;

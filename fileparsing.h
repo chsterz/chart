@@ -10,12 +10,12 @@
 #include "terminalcolors.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+
 void resetStream(std::istream &file)
 {
 	file.clear();
 	file.seekg(std::ios::beg);
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -36,7 +36,6 @@ bool isNewline(const char c)
 bool isCSV(std::istream &file)
 {
 	std::stringstream fileContents;
-
 	fileContents << file.rdbuf();
 
 	//check first data for label
@@ -52,7 +51,6 @@ bool isCSV(std::istream &file)
 
 		std::string dummyLabel;
 		fileContents >> dummyLabel;
-
 		while (isSeparator(fileContents.peek()) or isNewline(fileContents.peek()))
 			fileContents.ignore();
 	}
@@ -117,7 +115,6 @@ bool isRowData(std::istream &file)
 	std::stringstream fileContents;
 
 	fileContents << file.rdbuf();
-	//Extract one dummy value
 	float dummy;
 	fileContents >> dummy;
 
@@ -165,7 +162,6 @@ bool isColorFile(std::istream &file)
 	std::stringstream fileContents;
 
 	fileContents << file.rdbuf();
-	//Are all colors in Hex :)
 	if (fileContents.peek() != '#')
 		return false;
 	fileContents.ignore();

@@ -16,14 +16,15 @@ int main(int argc, char** argv)
 {
 	//Help Message
 	po::options_description desc( text::bold("Example 1: ") + "$data-producer | pie\n"
-								 +text::bold("Example 2:")+" $pie -f datadfile [-c colorfile]\n\n"
+								 +text::bold("Example 2:")+" $pie -f datafile [-c colorfile]\n\n"
 								 +text::bold("All Options:"));
 
 	//All program options
 	desc.add_options()
-			("help,h","Show this Message")
-			("colors,c",po::value<std::string>(), "colors for this chart" )
-			("data-file,f", po::value<std::string>(), "A file plot");
+			("help,h", "Show this Message")
+			("colors,c", po::value<std::string>(), "Colorfile for this chart")
+			("data-file,f", po::value<std::string>(), "A file plot")
+			("regroup,r", "Swaps rows and cols of the inputdata");
 
 	//Parse command line options
 	po::variables_map parameters;
@@ -36,7 +37,6 @@ int main(int argc, char** argv)
 		std::cout << desc << std::endl;
 		return EXIT_FAILURE;
 	}
-
 
 	//Get Data from File
 	Data data;
@@ -79,6 +79,7 @@ int main(int argc, char** argv)
 		return EXIT_FAILURE;
 	}
 
+	//Read Data from pipe
 	if(filledPipe)
 	{
 		std::stringstream ss;
@@ -117,22 +118,23 @@ int main(int argc, char** argv)
 	//Use the default if no file is provided
 	else colors = pie::defaultColors;
 
-
-	//latcheck if data empty
+	//Check if input empty
 	if (data.empty())
 	{
 		std::cerr << text::red("[Error]") << " Data seems to be empty." << std::endl << "Check if your input is filled." << std::endl;
 		return EXIT_FAILURE;
 	}
 
-	//rotate data
-	//TMP
-	if (not rotate(data))
+	//Rotate data
+	if (parameters.count("regroup"))
 	{
-		std::cerr << text::blue("[Info]") << " Could not rotate data." << std::endl;
+		if (not rotate(data))
+		{
+			std::cerr << text::blue("[Info]") << " Could not rotate data." << std::endl;
+		}
 	}
 
-	//#1 draw barcharts from the data
+	//Draw barcharts from the data
 	for(size_t i = 0; i < data.size(); i++)
 	{
 		if (data[i].empty()) continue;

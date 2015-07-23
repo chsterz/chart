@@ -101,20 +101,24 @@ namespace pie
 
 class BarChart
 {
-public:
+private:
+	Cairo::RefPtr<Cairo::PdfSurface> surface;
+	Cairo::RefPtr<Cairo::Context> cr;
 
+public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 	BarChart(const DataSet &dataset, const std::string& fileName, std::vector<Color> colors = pie::defaultColors, const std::string &title="")
 	{
-		Cairo::RefPtr<Cairo::PdfSurface> surface = Cairo::PdfSurface::create(fileName, swidth, sheight);
-		Cairo::RefPtr<Cairo::Context> cr = Cairo::Context::create(surface);
+		surface = Cairo::PdfSurface::create(fileName, swidth, sheight);
+		cr = Cairo::Context::create(surface);
 
 		//drawDebug(cr);
 
-		drawContent(cr, dataset, colors);
-		drawXAxis(cr);
-		drawYAxis(cr);
+		drawContent(dataset, colors);
+		drawXAxis();
+		drawYAxis();
+		drawTitle(title);
 
 		surface->finish();
 	}
@@ -122,7 +126,7 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	void drawContent(Cairo::RefPtr<Cairo::Context> &cr, const DataSet & dataset, const std::vector<Color> colors)
+	void drawContent(const DataSet & dataset, const std::vector<Color> colors)
 	{
 		size_t numberOfBars = dataset.size();
 		float spacerSpace = (numberOfBars + 1)*spacer;
@@ -169,7 +173,8 @@ public:
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-	void drawXAxis(Cairo::RefPtr<Cairo::Context> &cr)
+
+	void drawXAxis()
 	{
 		cr->set_line_width(1.0f);
 		cr->set_source_rgba(0.0f,0.0f,0.0f,1.0f);
@@ -180,7 +185,7 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	void drawYAxis(Cairo::RefPtr<Cairo::Context> &cr)
+	void drawYAxis()
 	{
 		cr->set_line_width(1.0f);
 		cr->set_source_rgba(fontColor.r(), fontColor.g(), fontColor.b(), fontColor.a());
@@ -189,9 +194,22 @@ public:
 		cr->stroke();
 	}
 
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	void drawDebug(Cairo::RefPtr<Cairo::Context> &cr)
+	void drawTitle(const std::string &title)
+	{
+		cr->select_font_face(fontFace, Cairo::FONT_SLANT_NORMAL,Cairo::FONT_WEIGHT_NORMAL);
+		cr->set_source_rgba(0.0f,0.0f,0.0f,1.0f);
+		cr->set_font_size(fontSize+8);
+		cr->get_text_extents(title, textExtents);
+		cr->move_to(ox + width/2 - textExtents.width/2, oy -1.0f * -(textExtents.height+5));
+		cr->show_text(title);
+	}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+	void drawDebug()
 	{
 		cr->set_line_width(1.0f);
 		cr->set_source_rgba(pie::debugColor.r(),pie::debugColor.g(),pie::debugColor.b(),pie::debugColor.a());
@@ -208,6 +226,7 @@ public:
 		cr->rectangle(y_axis_ox, y_axis_oy, y_axis_width, -1* y_axis_height);
 		cr->stroke();
 	}
+
 };
 
 }
